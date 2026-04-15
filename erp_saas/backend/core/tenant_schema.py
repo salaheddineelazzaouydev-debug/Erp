@@ -30,7 +30,10 @@ def ensure_schema_exists(schema_name: str) -> None:
         raise ValueError(f"Invalid schema name: {schema_name!r}")
 
     with connection.cursor() as cursor:
-        cursor.execute(f'CREATE SCHEMA IF NOT EXISTS "{schema_name}"')
+        # Use SQL identifier quoting to safely handle schema names
+        cursor.execute(
+            'CREATE SCHEMA IF NOT EXISTS %s' % connection.ops.quote_name(schema_name)
+        )
 
 
 def set_connection_schema(schema_name: str) -> None:
@@ -38,7 +41,9 @@ def set_connection_schema(schema_name: str) -> None:
         raise ValueError(f"Invalid schema name: {schema_name!r}")
 
     with connection.cursor() as cursor:
-        cursor.execute(f'SET search_path TO "{schema_name}", public')
+        # Use SQL identifier quoting to safely handle schema names
+        quoted_schema = connection.ops.quote_name(schema_name)
+        cursor.execute('SET search_path TO %s, public' % quoted_schema)
 
 
 def reset_connection_schema() -> None:
