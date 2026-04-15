@@ -1,7 +1,11 @@
-from django.urls import path
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
 
-from .views import health_check
+from .views import InvoiceViewSet
+
+router = DefaultRouter()
+router.register("invoices", InvoiceViewSet, basename="invoice")
 
 urlpatterns = [
-    path("health/", health_check, name="health-check"),
+    path("", include(router.urls)),
 ]
